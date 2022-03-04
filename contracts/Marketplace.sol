@@ -16,7 +16,7 @@ contract Marketplace {
 
 	//events
 
-	event newOffer(
+	event offerCreated(
 		uint offerId,
 		string tokenURI,
 		uint tokenId,
@@ -26,7 +26,7 @@ contract Marketplace {
 		address seller
 	);
 
-	event canceledOffer(
+	event offerCancelled(
 		uint offerId,
 		uint tokenId,
 		uint tokenAmount,
@@ -74,7 +74,7 @@ contract Marketplace {
 		);
 		offers.push(offer);
 
-		emit newOffer(
+		emit offerCreated(
 			offers.length - 1,
 			token.uri(tokenId),
 		 	tokenId,
@@ -98,10 +98,10 @@ contract Marketplace {
 		address seller = offer.seller;
 
 		require(msg.sender == seller, "You are not the transfer owner");
-		
+
 		delete offers[offerId];
 
-		emit canceledOffer(
+		emit offerCancelled(
 			offerId,
 			tokenId,
 			tokenAmount,
