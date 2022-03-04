@@ -1,0 +1,8 @@
+# Ignoring enviroment variables
+.env
+
+# Ignorig not required folders
+contract/
+node_modules/
+artifacts/
+cache/
