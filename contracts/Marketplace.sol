@@ -28,7 +28,6 @@ contract Marketplace {
 
 	event canceledOffer(
 		uint offerId,
-		string tokenURI,
 		uint tokenId,
 		uint tokenAmount,
 		uint price,
@@ -44,6 +43,8 @@ contract Marketplace {
 		address seller,
 		address buyer
 	);
+
+	// Functions
 
 	function setFee(uint _fee) public {
 		fee = _fee;
@@ -85,4 +86,27 @@ contract Marketplace {
 
 	} 
 
+	function cancelOffer(
+		uint offerId
+	)
+
+	public {
+		Offer storage offer = offers[offerId];
+		uint tokenId = offer.tokenId;
+		uint tokenAmount = offer.tokenAmount;
+		uint price = offer.price;
+		address seller = offer.seller;
+
+		require(msg.sender == seller, "You are not the transfer owner");
+		
+		delete offers[offerId];
+
+		emit canceledOffer(
+			offerId,
+			tokenId,
+			tokenAmount,
+			price,
+			seller
+		);
+	}
 }
