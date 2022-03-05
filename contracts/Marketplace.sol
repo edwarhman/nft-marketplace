@@ -36,7 +36,6 @@ contract Marketplace {
 
 	event buyed (
 		uint offerId,
-		string tokenURI,
 		uint tokenId,
 		uint tokenAmount,
 		uint price,
@@ -109,4 +108,60 @@ contract Marketplace {
 			seller
 		);
 	}
+
+	function buyTokens(
+		uint offerId,
+		string memory paymentMethod
+	)
+	payable 
+	public {
+		Offer memory offer = offers[offerId];
+		uint price = _getPrice(offer.price, paymentMethod);
+		uint approvedAmount = _getApprovedAmount(msg.sender, msg.value, paymentMethod);
+
+		require(approvedAmount >= price, "You have not send enough token for this transaction");
+		require(offer.seller != msg.sender, "You cannot buy your own tokens");
+		_handlePayment(msg.sender, price, approvedAmount, paymentMethod);
+
+		delete offers[offerId];
+
+		emit buyed (
+			offerId,
+			offer.tokenId,
+			offer.tokenAmount,
+			offer.price,
+			offer.seller,
+			msg.sender
+		);
+	}
+
+	function _getPrice(
+		uint offerPrice,
+		string memory paymentMethod
+	) 
+	internal
+	returns(uint) {
+		return 1;
+	}
+
+	function _getApprovedAmount(
+		address buyer,
+		uint sentValue,
+		string memory paymentMethod
+	) 
+	internal
+	returns(uint) {
+		return 1;
+	}
+
+	function _handlePayment(
+		address buyer,
+		uint price,
+		uint approved,
+		string memory paymentMethod
+	)
+	internal {
+
+	}
+
 }
