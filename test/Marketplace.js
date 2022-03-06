@@ -32,24 +32,28 @@ describe("Marketplace contract", ()=> {
 		})
 
 		describe("create new offer assumtions", ()=> {
+			let tokenId = 1;
+			let tokenAmount = 20;
+			let price = 100;
+
 			it("Should allow to create a new offer", async ()=> {
 				let expectedData = [
 					token.address,
-					ethers.BigNumber.from(1),
-					ethers.BigNumber.from(20),
-					ethers.BigNumber.from(100),
+					ethers.BigNumber.from(tokenId),
+					ethers.BigNumber.from(tokenAmount),
+					ethers.BigNumber.from(price),
 					owner.address
 				]; 
 
-				let tx = await token.mint(owner.address, 1, 30);
+				let tx = await token.mint(owner.address, tokenId, tokenAmount);
 				await tx.wait();
 
 				await market.createNewOffer(
 					token.address,
-					1,
-					20,
+					tokenId,
+					tokenAmount,
 					week,
-					100
+					price
 				);
 
 				let offerData = (await market.offers(0)).slice(0, expectedData.length);
