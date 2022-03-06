@@ -133,7 +133,33 @@ describe("Marketplace contract", ()=> {
 				.be
 				.revertedWith("You are not the offer owner");
 			});
-		})
+		});
+
+		describe("Accept offer assumtions", ()=> {
+			beforeEach(async ()=> {
+				await market.createNewOffer(
+					token.address,
+					tokenId,
+					tokenAmount,
+					week,
+					price
+				);
+			})
+
+			it("Should not allow to accept an offer if sent payment is less than offer price", async ()=> {
+				await expect(market.connect(addr1).acceptOffer(0, "ETH"))
+				.to
+				.be
+				.revertedWith("You have not send enough token for this transaction");
+			});
+
+			it("Should not allow to accept an offer if tx sender is offer seller", async ()=> {
+				await expect(market.acceptOffer(0, "ETH", {value: price}))
+				.to
+				.be
+				.revertedWith("You cannot buy your own tokens");
+			})
+		});
 	});
 
 
