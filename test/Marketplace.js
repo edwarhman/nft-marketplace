@@ -46,7 +46,7 @@ describe("Marketplace contract", ()=> {
 				]; 
 
 				let tx = await token.mint(owner.address, tokenId, tokenAmount);
-				await tx.wait();
+				//await tx.wait();
 
 				await market.createNewOffer(
 					token.address,
@@ -61,6 +61,19 @@ describe("Marketplace contract", ()=> {
 				.to
 				.deep
 				.equal(expectedData);
+			});
+
+			it("Should not allow to create a new offer if seller have not the specified amount of tokens", async ()=>{
+				await expect(market.createNewOffer(
+					token.address,
+					tokenId,
+					tokenAmount + 20,
+					week,
+					price,
+				))
+				.to
+				.be
+				.revertedWith("You do not have enough tokens to create the offer");
 			});
 		});
 	});
