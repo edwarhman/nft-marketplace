@@ -110,7 +110,7 @@ contract Marketplace {
 		);
 	}
 
-	function buyTokens(
+	function acceptOffer(
 		uint offerId,
 		string memory paymentMethod
 	)
