@@ -97,7 +97,7 @@ contract Marketplace {
 		uint price = offer.price;
 		address seller = offer.seller;
 
-		require(msg.sender == seller, "You are not the transfer owner");
+		require(msg.sender == seller, "You are not the offer owner");
 
 		delete offers[offerId];
 
