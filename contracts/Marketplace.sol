@@ -6,13 +6,13 @@ contract Marketplace {
 		address tokenAddress;
 		uint tokenId;
 		uint tokenAmount;
-		uint deadline;
 		uint price;
 		address seller;
+		uint deadline;
 	}
 
-	Offer[] offers;
-	uint fee;
+	Offer[] public offers;
+	uint public fee;
 
 	//events
 
@@ -57,6 +57,7 @@ contract Marketplace {
 		uint price
 	) 
 	public {
+		require(ERC1155(tokenAddress).supportsInterface(0x0e89341c), "The specified token address is not a ERC1155 token");
 		ERC1155 token = ERC1155(tokenAddress);
 		require(
 			token.balanceOf(msg.sender, tokenId) >= tokenAmount,
@@ -67,9 +68,9 @@ contract Marketplace {
 			tokenAddress,
 			tokenId,
 			tokenAmount,
-			deadline + block.timestamp,
 			price,
-			msg.sender
+			msg.sender,
+			deadline + block.timestamp
 		);
 		offers.push(offer);
 
@@ -96,7 +97,7 @@ contract Marketplace {
 		uint price = offer.price;
 		address seller = offer.seller;
 
-		require(msg.sender == seller, "You are not the transfer owner");
+		require(msg.sender == seller, "You are not the offer owner");
 
 		delete offers[offerId];
 
@@ -109,7 +110,7 @@ contract Marketplace {
 		);
 	}
 
-	function buyTokens(
+	function acceptOffer(
 		uint offerId,
 		string memory paymentMethod
 	)
@@ -141,7 +142,7 @@ contract Marketplace {
 	) 
 	internal
 	returns(uint) {
-		return 1;
+		return offerPrice;
 	}
 
 	function _getApprovedAmount(
@@ -151,7 +152,7 @@ contract Marketplace {
 	) 
 	internal
 	returns(uint) {
-		return 1;
+		return sentValue;
 	}
 
 	function _handlePayment(
