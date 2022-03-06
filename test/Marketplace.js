@@ -1,15 +1,21 @@
 const {expect} = require('chai');
 const provider = waffle.provider;
 
-describe("ERC1155 Token contract", ()=> {
-	let Market, market, owner, addr1, addr2;
+describe("Marketplace contract", ()=> {
+	let Market, market, Token, token, owner, addr1, addr2;
 
-	let name = "testcoin";
-	let symbol = "ttc";
-	let uri = "http://testcoin/";
+	//test token initialize variables
+	let tokenName = "testcoin";
+	let tokenSymbol = "ttc";
+	let tokenUri = "http://testcoin/";
+
+	//market variables
+	let week = 10;
 
 	before(async ()=> {
 		Market = await ethers.getContractFactory("Marketplace");
+		Token = await ethers.getContractFactory("ERC1155Token");
+		token = await Token.deploy(tokenName, tokenSymbol, tokenUri);
 	});
 
 	beforeEach(async ()=> {
@@ -24,6 +30,35 @@ describe("ERC1155 Token contract", ()=> {
 			.to
 			.equal(20);
 		})
+
+		describe("create new offer assumtions", ()=> {
+			it("Should allow to create a new offer", async ()=> {
+				let expectedData = [
+					token.address,
+					ethers.BigNumber.from(1),
+					ethers.BigNumber.from(20),
+					ethers.BigNumber.from(100),
+					owner.address
+				]; 
+
+				let tx = await token.mint(owner.address, 1, 30);
+				await tx.wait();
+
+				await market.createNewOffer(
+					token.address,
+					1,
+					20,
+					week,
+					100
+				);
+
+				let offerData = (await market.offers(0)).slice(0, expectedData.length);
+				expect(offerData)
+				.to
+				.deep
+				.equal(expectedData);
+			});
+		});
 	});
 
 
