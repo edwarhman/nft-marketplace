@@ -142,7 +142,7 @@ contract Marketplace {
 	) 
 	internal
 	returns(uint) {
-		return 1;
+		return offerPrice;
 	}
 
 	function _getApprovedAmount(
@@ -152,7 +152,7 @@ contract Marketplace {
 	) 
 	internal
 	returns(uint) {
-		return 1;
+		return sentValue;
 	}
 
 	function _handlePayment(
