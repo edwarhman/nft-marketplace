@@ -6,9 +6,9 @@ contract Marketplace {
 		address tokenAddress;
 		uint tokenId;
 		uint tokenAmount;
-		uint deadline;
 		uint price;
 		address seller;
+		uint deadline;
 	}
 
 	Offer[] public offers;
@@ -67,9 +67,9 @@ contract Marketplace {
 			tokenAddress,
 			tokenId,
 			tokenAmount,
-			deadline + block.timestamp,
 			price,
-			msg.sender
+			msg.sender,
+			deadline + block.timestamp
 		);
 		offers.push(offer);
 
