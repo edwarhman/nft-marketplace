@@ -63,6 +63,19 @@ describe("Marketplace contract", ()=> {
 				.equal(expectedData);
 			});
 
+			it("Should not allow to create a new offer if the token address is not a ERC1155 token", async ()=> {
+				await expect(market.createNewOffer(
+					market.address,
+					tokenId,
+					tokenAmount + 20,
+					week,
+					price,
+				))
+				.to
+				.be
+				.reverted;
+			});
+
 			it("Should not allow to create a new offer if seller have not the specified amount of tokens", async ()=>{
 				await expect(market.createNewOffer(
 					token.address,
