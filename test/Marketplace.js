@@ -119,7 +119,20 @@ describe("Marketplace contract", ()=> {
 				.equal(expectedData);
 			});
 
+			it("Should not allow to cancel the offer if tx sender is not the offer seller", async ()=> {
+				await market.createNewOffer(
+					token.address,
+					tokenId,
+					tokenAmount,
+					week,
+					price
+				);
 
+				await expect(market.connect(addr1).cancelOffer(0))
+				.to
+				.be
+				.revertedWith("You are not the offer owner");
+			});
 		})
 	});
 
