@@ -57,6 +57,7 @@ contract Marketplace {
 		uint price
 	) 
 	public {
+		require(ERC1155(tokenAddress).supportsInterface(0x0e89341c), "The specified token address is not a ERC1155 token");
 		ERC1155 token = ERC1155(tokenAddress);
 		require(
 			token.balanceOf(msg.sender, tokenId) >= tokenAmount,
