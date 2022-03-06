@@ -24,6 +24,11 @@ describe("Marketplace contract", ()=> {
 	});
 
 	describe("Public functions tests", ()=> {
+		// create a new offer variables
+		let tokenId = 1;
+		let tokenAmount = 20;
+		let price = 100;
+
 		it("set selling fee", async ()=> {
 			await market.setFee(20);
 			expect(await market.fee())
@@ -32,9 +37,6 @@ describe("Marketplace contract", ()=> {
 		})
 
 		describe("create new offer assumtions", ()=> {
-			let tokenId = 1;
-			let tokenAmount = 20;
-			let price = 100;
 
 			it("Should allow to create a new offer", async ()=> {
 				let expectedData = [
@@ -89,6 +91,36 @@ describe("Marketplace contract", ()=> {
 				.revertedWith("You do not have enough tokens to create the offer");
 			});
 		});
+
+		describe("Cancel offer assumtions", ()=> {
+			it("Should allow to cancel the offer", async ()=> {
+				let expectedData = [
+					ethers.constants.AddressZero,
+					ethers.BigNumber.from(0),
+					ethers.BigNumber.from(0),
+					ethers.BigNumber.from(0),
+					ethers.constants.AddressZero
+				];
+
+				await market.createNewOffer(
+					token.address,
+					tokenId,
+					tokenAmount,
+					week,
+					price
+				);
+
+				await market.cancelOffer(0);
+
+				let offerData = (await market.offers(0)).slice(0, expectedData.length);
+				expect(offerData)
+				.to
+				.deep
+				.equal(expectedData);
+			});
+
+
+		})
 	});
 
 
