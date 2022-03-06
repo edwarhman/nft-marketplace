@@ -11,8 +11,8 @@ contract Marketplace {
 		address seller;
 	}
 
-	Offer[] offers;
-	uint fee;
+	Offer[] public offers;
+	uint public fee;
 
 	//events
 
