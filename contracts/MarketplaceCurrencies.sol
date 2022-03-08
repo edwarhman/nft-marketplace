@@ -10,6 +10,12 @@ contract MarketplaceCurrencies is Initializable, OwnableUpgradeable {
 	AggregatorV3Interface internal daiPriceFeed;
 	AggregatorV3Interface internal linkPriceFeed;
 
+	enum Currency {
+		ETH,
+		DAI,
+		LINK
+	}
+
 	function initialize(
 		address _priceFeed,
 		address _daiPriceFeed,
@@ -24,20 +30,37 @@ contract MarketplaceCurrencies is Initializable, OwnableUpgradeable {
 	}
 
 	function _getPrice(
-		uint offerPrice,
-		string memory paymentMethod
+		int offerPrice,
+		Currency paymentMethod
 	) 
 	internal
-	returns(uint) {
-		return offerPrice;
+	view
+	returns(int) {
+		int price;
+		int currencyPrice;
+		uint currencyDecimals;
+		if(paymentMethod == Currency.ETH) {
+			currencyPrice = _getEthUsdPrice();
+			currencyDecimals = ethPriceFeed.decimals();
+		} else if (paymentMethod == Currency.DAI) {
+			currencyPrice = _getDaiUsdPrice();
+			currencyDecimals = daiPriceFeed.decimals();
+		} else if (paymentMethod == Currency.LINK) {
+			currencyPrice = _getLinkUsdPrice();
+			currencyDecimals = linkPriceFeed.decimals();
+		}
+
+		price =  1 ether * int(10**currencyDecimals) * offerPrice / currencyPrice; 
+		return price;
 	}
 
 	function _getApprovedAmount(
 		address buyer,
 		uint sentValue,
-		string memory paymentMethod
+		Currency paymentMethod
 	) 
 	internal
+	view
 	returns(uint) {
 		return sentValue;
 	}
@@ -46,13 +69,13 @@ contract MarketplaceCurrencies is Initializable, OwnableUpgradeable {
 		address buyer,
 		uint price,
 		uint approved,
-		string memory paymentMethod
+		Currency paymentMethod
 	)
 	internal {
 
 	}
 
-	function getEthUsdPrice() 
+	function _getEthUsdPrice() 
 	public
 	view
 	returns(int) {
@@ -60,7 +83,7 @@ contract MarketplaceCurrencies is Initializable, OwnableUpgradeable {
 		return price;
 	}
 
-	function getDaiUsdPrice() 
+	function _getDaiUsdPrice() 
 	public
 	view
 	returns(int) {
@@ -68,7 +91,7 @@ contract MarketplaceCurrencies is Initializable, OwnableUpgradeable {
 		return price;
 	}
 
-	function getLinkUsdPrice() 
+	function _getLinkUsdPrice() 
 	public
 	view
 	returns(int) {
