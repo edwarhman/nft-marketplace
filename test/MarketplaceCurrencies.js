@@ -8,9 +8,15 @@ describe("Marketplace Currencies management", ()=> {
 	let ethPrice = 257543456568;
 	let decimals = 8;
 
+	Currency = {
+		ETH: 0,
+		DAI: 1,
+		LINK: 2
+	}
+
 	before(async ()=> {
 		Mock = await ethers.getContractFactory("MockV3Aggregator")
-		Manager = await ethers.getContractFactory("MarketplaceCurrencies");
+		Manager = await ethers.getContractFactory("TestMarketplaceCurrencies");
 	});
 
 	beforeEach(async ()=> {
@@ -57,5 +63,24 @@ describe("Marketplace Currencies management", ()=> {
 			.equal((await mockLink.latestRoundData()).answer);
 						
 		});
+	});
+
+	describe("Assumptions for functions used inside acceptOffer function", ()=> {
+		it("getPrice should get the offer price in the different currencies correctly", async ()=> {
+			let offerPrice = 99;
+			let expectedEth = ethers.constants.WeiPerEther.mul(offerPrice).mul(10**decimals).div(ethPrice);
+			let expectedDai = ethers.constants.WeiPerEther.mul(offerPrice).mul(10**decimals).div(daiPrice);
+			let expectedLink = ethers.constants.WeiPerEther.mul(offerPrice).mul(10**decimals).div(linkPrice);
+
+			expect((await manager.getPrice(offerPrice, Currency.ETH)))
+			.to
+			.equal(expectedEth);
+			expect((await manager.getPrice(offerPrice, Currency.DAI)))
+			.to
+			.equal(expectedDai);
+			expect((await manager.getPrice(offerPrice, Currency.LINK)))
+			.to
+			.equal(expectedLink);
+		})
 	});
 });
