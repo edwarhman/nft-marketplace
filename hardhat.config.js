@@ -2,6 +2,26 @@
  * @type import('hardhat/config').HardhatUserConfig
  */
 require("@nomiclabs/hardhat-waffle");
+require("@openzeppelin/hardhat-upgrades");
+require('dotenv').config()
+
 module.exports = {
-  solidity: "0.8.12",
+  defaultNetwork: "hardhat",
+  networks: {
+    hardhat: {
+      /*forking: {
+        url: process.env.ALCHEMY_MAINNET_RPC_URL,
+      }*/
+    },
+  },
+  solidity: {
+    compilers: [
+      {
+        version: "0.6.12",
+      },
+      {
+        version: "0.8.12",
+      },
+    ],
+  },
 };
