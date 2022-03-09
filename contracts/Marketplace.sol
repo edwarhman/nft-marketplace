@@ -15,6 +15,9 @@ contract Marketplace is MarketplaceCurrencies {
 
 	Offer[] public offers;
 	uint public fee;
+	address recipient;
+	///@notice Role required to manipulate admin functions
+	bytes32 public constant ADMIN = keccak256("ADMIN");
 
 	//events
 
@@ -64,10 +67,16 @@ contract Marketplace is MarketplaceCurrencies {
 			_linkContract
 		);
 		setFee(_fee);
+		_setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
+		_setupRole(ADMIN, msg.sender);
 	}
 
-	function setFee(uint _fee) public {
+	function setFee(uint _fee) public onlyRole(ADMIN) {
 		fee = _fee;
+	}
+
+	function setRecipient(address _recipient) public onlyRole(ADMIN) {
+		recipient = _recipient;
 	}
 
 	function createNewOffer(

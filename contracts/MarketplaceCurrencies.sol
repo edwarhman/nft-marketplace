@@ -1,12 +1,12 @@
 pragma solidity >= 0.8.0 < 0.9.0;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "@chainlink/contracts/src/v0.8/Denominations.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-contract MarketplaceCurrencies is Initializable, OwnableUpgradeable {
+contract MarketplaceCurrencies is Initializable, AccessControlUpgradeable {
 	AggregatorV3Interface internal ethPriceFeed;
 	AggregatorV3Interface internal daiPriceFeed;
 	AggregatorV3Interface internal linkPriceFeed;
@@ -28,7 +28,6 @@ contract MarketplaceCurrencies is Initializable, OwnableUpgradeable {
 	)
 	internal
 	onlyInitializing {
-		__Ownable_init();
 		ethPriceFeed = AggregatorV3Interface(_priceFeed);
 		daiPriceFeed = AggregatorV3Interface(_daiPriceFeed);
 		linkPriceFeed = AggregatorV3Interface(_linkPriceFeed);
