@@ -18,7 +18,7 @@ contract TestMarketplaceCurrencies is MarketplaceCurrencies {
 
 	function getApprovedAmount(
 		address buyer,
-		uint sentValue,
+		int sentValue,
 		Currency paymentMethod
 	) 
 	external
@@ -28,13 +28,23 @@ contract TestMarketplaceCurrencies is MarketplaceCurrencies {
 	}
 
 	function handlePayment(
+		address seller,
 		address buyer,
 		uint price,
+		uint fee,
 		uint approved,
 		Currency paymentMethod
 	)
-	external {
-		_handlePayment(buyer, price, approved, paymentMethod);
+	external
+	payable {
+		_handlePayment(
+			seller,
+			buyer,
+			price,
+			fee,
+			approved,
+			paymentMethod
+		);
 	}
 
 	function getEthUsdPrice() 
