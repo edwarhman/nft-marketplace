@@ -46,6 +46,25 @@ contract Marketplace is MarketplaceCurrencies {
 	);
 
 	// Functions
+	function initialize(
+		address _ethPriceFeed,
+		address _daiPriceFeed,
+		address _linkPriceFeed,
+		address _daiContract,
+		address _linkContract,
+		uint _fee
+	)
+	public
+	initializer {
+		__MarketplaceCurrencies_init(
+			_ethPriceFeed,
+			_daiPriceFeed,
+			_linkPriceFeed,
+			_daiContract,
+			_linkContract
+		);
+		setFee(_fee);
+	}
 
 	function setFee(uint _fee) public {
 		fee = _fee;

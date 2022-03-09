@@ -3,6 +3,25 @@ import "../MarketplaceCurrencies.sol";
 import "hardhat/console.sol";
 
 contract TestMarketplaceCurrencies is MarketplaceCurrencies {
+
+	function initialize(
+		address _ethPriceFeed,
+		address _daiPriceFeed,
+		address _linkPriceFeed,
+		address _daiContract,
+		address _linkContract
+	)
+	public
+	initializer {
+		__MarketplaceCurrencies_init(
+			_ethPriceFeed,
+			_daiPriceFeed,
+			_linkPriceFeed,
+			_daiContract,
+			_linkContract
+		);
+	}
+
 	function getPrice(
 		uint offerPrice,
 		Currency paymentMethod

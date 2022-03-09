@@ -19,15 +19,15 @@ contract MarketplaceCurrencies is Initializable, OwnableUpgradeable {
 
 	mapping(Currency => address) currencyToAddress;
 
-	function initialize(
+	function __MarketplaceCurrencies_init(
 		address _priceFeed,
 		address _daiPriceFeed,
 		address _linkPriceFeed,
 		address _daiContract,
 		address _linkContract
 	)
-	public
-	initializer {
+	internal
+	onlyInitializing {
 		__Ownable_init();
 		ethPriceFeed = AggregatorV3Interface(_priceFeed);
 		daiPriceFeed = AggregatorV3Interface(_daiPriceFeed);
