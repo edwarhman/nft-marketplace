@@ -63,6 +63,14 @@ describe("Marketplace contract", ()=> {
 		let tokenAmount = 20;
 		let price = 100;
 
+		let emptyOffer = [
+					ethers.constants.AddressZero,
+					ethers.BigNumber.from(0),
+					ethers.BigNumber.from(0),
+					ethers.BigNumber.from(0),
+					ethers.constants.AddressZero
+				];
+
 		it("set selling fee", async ()=> {
 			await market.setFee(20);
 			expect(await market.fee())
@@ -127,15 +135,7 @@ describe("Marketplace contract", ()=> {
 		});
 
 		describe("Cancel offer assumtions", ()=> {
-			it("Should allow to cancel the offer", async ()=> {
-				let expectedData = [
-					ethers.constants.AddressZero,
-					ethers.BigNumber.from(0),
-					ethers.BigNumber.from(0),
-					ethers.BigNumber.from(0),
-					ethers.constants.AddressZero
-				];
-
+			beforeEach(async ()=> {
 				await market.createNewOffer(
 					token.address,
 					tokenId,
@@ -143,25 +143,22 @@ describe("Marketplace contract", ()=> {
 					week,
 					price
 				);
+			});
+
+			it("Should allow to cancel the offer", async ()=> {
+				
+
 
 				await market.cancelOffer(0);
 
-				let offerData = (await market.offers(0)).slice(0, expectedData.length);
+				let offerData = (await market.offers(0)).slice(0, emptyOffer.length);
 				expect(offerData)
 				.to
 				.deep
-				.equal(expectedData);
+				.equal(emptyOffer);
 			});
 
 			it("Should not allow to cancel the offer if tx sender is not the offer seller", async ()=> {
-				await market.createNewOffer(
-					token.address,
-					tokenId,
-					tokenAmount,
-					week,
-					price
-				);
-
 				await expect(market.connect(addr1).cancelOffer(0))
 				.to
 				.be
@@ -193,6 +190,12 @@ describe("Marketplace contract", ()=> {
 				.to
 				.be
 				.revertedWith("You cannot buy your own tokens");
+			});
+
+			it("Should allow to accept the offer when sender is not the seller and sent enough money", async ()=> {
+				await market.connect(addr1).acceptOffer(0, ethEnum, {value: price});
+
+
 			})
 		});
 	});
