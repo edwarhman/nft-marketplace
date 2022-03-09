@@ -37,13 +37,13 @@ contract MarketplaceCurrencies is Initializable, OwnableUpgradeable {
 	}
 
 	function _getPrice(
-		int offerPrice,
+		uint offerPrice,
 		Currency paymentMethod
 	) 
 	internal
 	view
-	returns(int) {
-		int price;
+	returns(uint) {
+		uint price;
 		int currencyPrice;
 		uint currencyDecimals;
 		if(paymentMethod == Currency.ETH) {
@@ -57,13 +57,13 @@ contract MarketplaceCurrencies is Initializable, OwnableUpgradeable {
 			currencyDecimals = linkPriceFeed.decimals();
 		}
 
-		price =  1 ether * int(10**currencyDecimals) * offerPrice / currencyPrice; 
+		price =  1 ether * (10**currencyDecimals) * offerPrice / uint(currencyPrice); 
 		return price;
 	}
 
 	function _getApprovedAmount(
 		address buyer,
-		int sentValue,
+		uint sentValue,
 		Currency paymentMethod
 	) 
 	internal
@@ -72,7 +72,7 @@ contract MarketplaceCurrencies is Initializable, OwnableUpgradeable {
 		uint approvedAmount;
 
 		if(paymentMethod == Currency.ETH) {
-			approvedAmount = uint(sentValue);
+			approvedAmount = sentValue;
 		} else if (paymentMethod == Currency.DAI) {
 			approvedAmount = ERC20(currencyToAddress[Currency.DAI]).allowance(buyer, address(this));
 		} else if (paymentMethod == Currency.LINK) {
@@ -131,7 +131,7 @@ contract MarketplaceCurrencies is Initializable, OwnableUpgradeable {
 	}
 
 	function _getEthUsdPrice() 
-	public
+	internal
 	view
 	returns(int) {
 		(,int price,,,) = ethPriceFeed.latestRoundData();
@@ -139,7 +139,7 @@ contract MarketplaceCurrencies is Initializable, OwnableUpgradeable {
 	}
 
 	function _getDaiUsdPrice() 
-	public
+	internal
 	view
 	returns(int) {
 		(,int price,,,) = daiPriceFeed.latestRoundData();
@@ -147,7 +147,7 @@ contract MarketplaceCurrencies is Initializable, OwnableUpgradeable {
 	}
 
 	function _getLinkUsdPrice() 
-	public
+	internal
 	view
 	returns(int) {
 		(,int price,,,) = linkPriceFeed.latestRoundData();
