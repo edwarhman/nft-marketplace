@@ -66,9 +66,10 @@ contract Marketplace is MarketplaceCurrencies {
 			_daiContract,
 			_linkContract
 		);
-		setFee(_fee);
 		_setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
 		_setupRole(ADMIN, msg.sender);
+		setFee(_fee);
+		setRecipient(msg.sender);
 	}
 
 	function setFee(uint _fee) public onlyRole(ADMIN) {
