@@ -4,13 +4,13 @@ import "hardhat/console.sol";
 
 contract TestMarketplaceCurrencies is MarketplaceCurrencies {
 	function getPrice(
-		int offerPrice,
+		uint offerPrice,
 		Currency paymentMethod
 	) 
 	external
 	view
-	returns(int) {		
-		int result;
+	returns(uint) {		
+		uint result;
 		result = _getPrice(offerPrice, paymentMethod);
 		console.log("The price in the Currency is: %d", uint(result));
 		return result;
@@ -18,7 +18,7 @@ contract TestMarketplaceCurrencies is MarketplaceCurrencies {
 
 	function getApprovedAmount(
 		address buyer,
-		int sentValue,
+		uint sentValue,
 		Currency paymentMethod
 	) 
 	external
