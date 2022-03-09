@@ -25,7 +25,8 @@ describe("Marketplace contract", ()=> {
 
 	//market variables
 	let week = 10;
-
+	let weiPerEther = ethers.constants.WeiPerEther;
+	let fee = 5;
 	//feeds variables
 	let daiPrice = 100007329;
 	let linkPrice = 1329348881;
@@ -52,7 +53,8 @@ describe("Marketplace contract", ()=> {
 				mockDaiFeed.address,
 				mockLinkFeed.address,
 				mockDaiCoin.address,
-				mockLinkCoin.address
+				mockLinkCoin.address,
+				fee
 		]);
     	[owner, addr1, addr2, _] = await ethers.getSigners();
 	});
@@ -61,7 +63,7 @@ describe("Marketplace contract", ()=> {
 		// create a new offer variables
 		let tokenId = 1;
 		let tokenAmount = 20;
-		let price = 100;
+		let price = 1000;
 
 		let emptyOffer = [
 					ethers.constants.AddressZero,
@@ -193,9 +195,13 @@ describe("Marketplace contract", ()=> {
 			});
 
 			it("Should allow to accept the offer when sender is not the seller and sent enough money", async ()=> {
-				await market.connect(addr1).acceptOffer(0, ethEnum, {value: price});
+				await market.connect(addr1).acceptOffer(0, ethEnum, {value: weiPerEther});
 
-
+				let offerData = (await market.offers(0)).slice(0, emptyOffer.length);
+				expect(offerData)
+				.to
+				.deep
+				.equal(emptyOffer);
 			})
 		});
 	});
