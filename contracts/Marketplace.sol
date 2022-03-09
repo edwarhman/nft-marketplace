@@ -1,7 +1,9 @@
 pragma solidity >= 0.8.0 < 0.9.0;
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
+import "./MarketplaceCurrencies.sol";
 
-contract Marketplace {
+
+contract Marketplace is MarketplaceCurrencies {
 	struct Offer {
 		address tokenAddress;
 		uint tokenId;
@@ -89,7 +91,6 @@ contract Marketplace {
 	function cancelOffer(
 		uint offerId
 	)
-
 	public {
 		Offer storage offer = offers[offerId];
 		uint tokenId = offer.tokenId;
@@ -112,7 +113,7 @@ contract Marketplace {
 
 	function acceptOffer(
 		uint offerId,
-		string memory paymentMethod
+		Currency paymentMethod
 	)
 	payable 
 	public {
@@ -120,9 +121,17 @@ contract Marketplace {
 		uint price = _getPrice(offer.price, paymentMethod);
 		uint approvedAmount = _getApprovedAmount(msg.sender, msg.value, paymentMethod);
 
-		require(approvedAmount >= price, "You have not send enough token for this transaction");
 		require(offer.seller != msg.sender, "You cannot buy your own tokens");
-		_handlePayment(msg.sender, price, approvedAmount, paymentMethod);
+		require(approvedAmount >= price, "You have not sent enough token for this transaction");
+		
+		_handlePayment(
+			offer.seller,
+			msg.sender,
+			price,
+			fee,
+			approvedAmount,
+			paymentMethod
+		);
 
 		delete offers[offerId];
 
@@ -135,34 +144,4 @@ contract Marketplace {
 			msg.sender
 		);
 	}
-
-	function _getPrice(
-		uint offerPrice,
-		string memory paymentMethod
-	) 
-	internal
-	returns(uint) {
-		return offerPrice;
-	}
-
-	function _getApprovedAmount(
-		address buyer,
-		uint sentValue,
-		string memory paymentMethod
-	) 
-	internal
-	returns(uint) {
-		return sentValue;
-	}
-
-	function _handlePayment(
-		address buyer,
-		uint price,
-		uint approved,
-		string memory paymentMethod
-	)
-	internal {
-
-	}
-
 }
