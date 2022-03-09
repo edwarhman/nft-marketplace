@@ -82,13 +82,52 @@ contract MarketplaceCurrencies is Initializable, OwnableUpgradeable {
 	}
 
 	function _handlePayment(
+		address seller,
 		address buyer,
 		uint price,
-		uint approved,
+		uint fee,
+		uint approvedAmount,
 		Currency paymentMethod
 	)
 	internal {
+		uint toDiscount = price * fee / 100;
+		ERC20 coin;
 
+		if(paymentMethod == Currency.ETH) {
+			(bool fe,) = payable(seller).call{value: price - toDiscount}("");
+			require(fe, "ETH was not sent to offer seller");
+			
+			if (approvedAmount > price) {
+				(bool re,) = payable(buyer).call{value:approvedAmount - price}("");
+				require(re, "Exceeds of ETH was not returned");
+			}
+		} else if (paymentMethod == Currency.DAI) {
+			coin = ERC20(currencyToAddress[Currency.DAI]);
+
+			coin.transferFrom(
+				buyer,
+				address(this),
+				toDiscount
+			);
+			coin.transferFrom(
+				buyer,
+				seller,
+				price - toDiscount
+			);
+		} else if (paymentMethod == Currency.LINK) {
+			coin = ERC20(currencyToAddress[Currency.LINK]);
+
+			coin.transferFrom(
+				buyer,
+				address(this),
+				toDiscount
+			);
+			coin.transferFrom(
+				buyer,
+				seller,
+				price - toDiscount
+			);
+		}
 	}
 
 	function _getEthUsdPrice() 
