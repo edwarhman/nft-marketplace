@@ -53,7 +53,7 @@ describe("Marketplace Currencies management", ()=> {
 		await manager.deployed();
 	});
 
-	xdescribe("Deployment", ()=> {
+	describe("Deployment", ()=> {
 		it("Should set ETH, DAI and LINK aggregators addresses correctly", async ()=> {
 			const ethAddress = await manager.getEthPriceFeed();
 			const daiAddress = await manager.getDaiPriceFeed();
@@ -73,7 +73,7 @@ describe("Marketplace Currencies management", ()=> {
 		});
 	});
 
-	xdescribe("Correct connecting to chainlink oracle", ()=> {
+	describe("Correct connecting to chainlink oracle", ()=> {
 		it("Should get prices from the mocks", async ()=> {
 			expect(await manager.getEthUsdPrice())
 			.to
@@ -91,11 +91,26 @@ describe("Marketplace Currencies management", ()=> {
 	});
 
 	describe("Assumptions for functions used inside acceptOffer function", ()=> {
-		xit("getPrice should get the offer price in the different currencies correctly", async ()=> {
+		it("getPrice should get the offer price in the different currencies correctly", async ()=> {
 			let offerPrice = 75;
-			let expectedEth = ethers.constants.WeiPerEther.mul(offerPrice).mul(10**decimals).div(ethPrice);
-			let expectedDai = ethers.constants.WeiPerEther.mul(offerPrice).mul(10**decimals).div(daiPrice);
-			let expectedLink = ethers.constants.WeiPerEther.mul(offerPrice).mul(10**decimals).div(linkPrice);
+			let expectedEth = ethers
+								.constants
+								.WeiPerEther
+								.mul(offerPrice)
+								.mul(10**decimals)
+								.div(ethPrice);
+			let expectedDai = ethers
+								.constants
+								.WeiPerEther
+								.mul(offerPrice)
+								.mul(10**decimals)
+								.div(daiPrice);
+			let expectedLink = ethers
+								.constants
+								.WeiPerEther
+								.mul(offerPrice)
+								.mul(10**decimals)
+								.div(linkPrice);
 
 			expect((await manager.getPrice(offerPrice, Currency.ETH)))
 			.to
@@ -108,7 +123,7 @@ describe("Marketplace Currencies management", ()=> {
 			.equal(expectedLink);
 		});
 
-		xit("getApprovedAmount should get the approved amounts per each coin", async ()=> {
+		it("getApprovedAmount should get the approved amounts per each coin", async ()=> {
 
 			let approvedDai = ethers.constants.WeiPerEther.mul(100);
 			let etherSent = "29121298983652304";
