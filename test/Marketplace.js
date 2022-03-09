@@ -2,7 +2,21 @@ const {expect} = require('chai');
 const provider = waffle.provider;
 
 describe("Marketplace contract", ()=> {
-	let Market, market, Token, token, owner, addr1, addr2;
+	//smart contracts variables
+	let Market,
+		market,
+		Token,
+		token,
+		owner,
+		addr1,
+		addr2,
+		MockFeed,
+		mockEthFeed,
+		mockLinkFeed,
+		mockDaiFeed,
+		MockCoin,
+		mockDaiCoin,
+		mockLinkCoin;
 
 	//test token initialize variables
 	let tokenName = "testcoin";
@@ -12,14 +26,34 @@ describe("Marketplace contract", ()=> {
 	//market variables
 	let week = 10;
 
+	//feeds variables
+	let daiPrice = 100007329;
+	let linkPrice = 1329348881;
+	let ethPrice = 257543456568;
+	let decimals = 8;
+
 	before(async ()=> {
 		Market = await ethers.getContractFactory("Marketplace");
 		Token = await ethers.getContractFactory("ERC1155Token");
 		token = await Token.deploy(tokenName, tokenSymbol, tokenUri);
+		MockFeed = await ethers.getContractFactory("MockV3Aggregator")
+		MockCoin = await ethers.getContractFactory("ERC20Token");
 	});
 
 	beforeEach(async ()=> {
-		market = await Market.deploy();
+		mockEthFeed = await MockFeed.deploy(decimals, ethPrice);
+    	mockLinkFeed = await MockFeed.deploy(decimals, linkPrice);
+    	mockDaiFeed = await MockFeed.deploy(decimals, daiPrice);
+    	mockDaiCoin = await MockCoin.deploy("Mock DAI", "DAI");
+    	mockLinkCoin = await MockCoin.deploy("Mock LINK", "LINK");
+		market = await upgrades.deployProxy(
+			Market, [
+				mockEthFeed.address,
+				mockDaiFeed.address,
+				mockLinkFeed.address,
+				mockDaiCoin.address,
+				mockLinkCoin.address
+		]);
     	[owner, addr1, addr2, _] = await ethers.getSigners();
 	});
 
@@ -136,6 +170,7 @@ describe("Marketplace contract", ()=> {
 		});
 
 		describe("Accept offer assumtions", ()=> {
+			const ethEnum = 0;
 			beforeEach(async ()=> {
 				await market.createNewOffer(
 					token.address,
@@ -147,14 +182,14 @@ describe("Marketplace contract", ()=> {
 			})
 
 			it("Should not allow to accept an offer if sent payment is less than offer price", async ()=> {
-				await expect(market.connect(addr1).acceptOffer(0, "ETH"))
+				await expect(market.connect(addr1).acceptOffer(0, ethEnum))
 				.to
 				.be
-				.revertedWith("You have not send enough token for this transaction");
+				.revertedWith("You have not sent enough token for this transaction");
 			});
 
 			it("Should not allow to accept an offer if tx sender is offer seller", async ()=> {
-				await expect(market.acceptOffer(0, "ETH", {value: price}))
+				await expect(market.acceptOffer(0, ethEnum, {value: price}))
 				.to
 				.be
 				.revertedWith("You cannot buy your own tokens");
