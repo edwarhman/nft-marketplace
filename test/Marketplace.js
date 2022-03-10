@@ -151,7 +151,13 @@ describe("Marketplace contract", ()=> {
 
 		describe("AcceptOffer assumtions", ()=> {
 			
-			
+			it("Should not allow to accept an offer that does not exist", async ()=> {
+				await market.cancelOffer(0);
+				await expect(market.connect(addr1).acceptOffer(0, ethEnum, {value: weiPerEther}))
+				.to
+				.be
+				.revertedWith("Specified Offer does not exist");				
+			});
 
 			it("Should not allow to accept an offer if sent payment is less than offer price", async ()=> {
 				await expect(market.connect(addr1).acceptOffer(0, ethEnum))
