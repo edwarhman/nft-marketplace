@@ -2,7 +2,10 @@ pragma solidity >= 0.8.0 < 0.9.0;
 import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
 import "./MarketplaceCurrencies.sol";
 
-
+///@title NFT Marketplace
+///@author Emerson Warhman
+///@notice You can use this contract to manage an NFT Marketplace
+///@notice Users can sell their ERC1155 NFTs, reciving ETH, DAI or LINK
 contract Marketplace is MarketplaceCurrencies {
 	struct Offer {
 		address tokenAddress;
@@ -13,7 +16,9 @@ contract Marketplace is MarketplaceCurrencies {
 		uint deadline;
 	}
 
+	///@notice Collections of active offers
 	Offer[] public offers;
+	///@notice commission received for the contract
 	uint public fee;
 	address recipient;
 	///@notice Role required to manipulate admin functions
@@ -21,6 +26,14 @@ contract Marketplace is MarketplaceCurrencies {
 
 	//events
 
+	///@notice Event emitted when a new offer is created
+	///@param offerId Position of the offer in the collection
+	///@param tokenURI Uri that point to NFT metadata
+	///@param tokenId Token identifier
+	///@param tokenAmount Amount of token published in the offer
+	///@param deadline Time the offer will be available
+	///@param price Price for all tokens published
+	///@param seller address of the seller of the tokens
 	event offerCreated(
 		uint offerId,
 		string tokenURI,
@@ -31,6 +44,12 @@ contract Marketplace is MarketplaceCurrencies {
 		address seller
 	);
 
+	///@notice Event emitted when an offer is cancelled
+	///@param offerId Position of the offer in the collection
+	///@param tokenId Token identifier
+	///@param tokenAmount Amount of token published in the offer
+	///@param price Price for all tokens published
+	///@param seller address of the seller of the tokens
 	event offerCancelled(
 		uint offerId,
 		uint tokenId,
@@ -39,7 +58,14 @@ contract Marketplace is MarketplaceCurrencies {
 		address seller
 	);
 
-	event buyed (
+	///@notice Event emitted when an offer is accepted
+	///@param offerId Position of the offer in the collection
+	///@param tokenId Token identifier
+	///@param tokenAmount Amount of token published in the offer
+	///@param price Price for all tokens published
+	///@param seller address of the seller of the tokens
+	///@param buyer Address of the buyer of the tokens
+	event offerAccepted (
 		uint offerId,
 		uint tokenId,
 		uint tokenAmount,
@@ -72,14 +98,25 @@ contract Marketplace is MarketplaceCurrencies {
 		setRecipient(msg.sender);
 	}
 
+	///@notice Set the fee of transactions
+	///@param _fee New fee
 	function setFee(uint _fee) public onlyRole(ADMIN) {
 		fee = _fee;
 	}
 
+
+	///@notice Set the recipient of contract funds
+	///@param _recipient New recipient
 	function setRecipient(address _recipient) public onlyRole(ADMIN) {
 		recipient = _recipient;
 	}
 
+	///@notice Create a new NFT offer 
+	///@param tokenAddress NFT contract address
+	///@param tokenId Token identifier
+	///@param tokenAmount Amount to Tokens to sell
+	///@param deadline Time the offer will be available
+	///@param price Price for all tokens published
 	function createNewOffer(
 		address tokenAddress,
 		uint tokenId,
@@ -117,6 +154,9 @@ contract Marketplace is MarketplaceCurrencies {
 
 	} 
 
+	///@notice Let cancel an offer
+	///@param offerId Position of the offer in the collection
+	///@dev set especified offer to the default value
 	function cancelOffer(
 		uint offerId
 	)
@@ -140,6 +180,9 @@ contract Marketplace is MarketplaceCurrencies {
 		);
 	}
 
+	///@notice Allow to pay for a NFT offer
+	///@param offerId Position of the offer in the collection
+	///@param paymentMethod Payment method used for the transaction (ETH, DAI, LINK)
 	function acceptOffer(
 		uint offerId,
 		Currency paymentMethod
@@ -166,7 +209,7 @@ contract Marketplace is MarketplaceCurrencies {
 
 		delete offers[offerId];
 
-		emit buyed (
+		emit offerAccepted (
 			offerId,
 			offer.tokenId,
 			offer.tokenAmount,
@@ -177,6 +220,7 @@ contract Marketplace is MarketplaceCurrencies {
 	}
 
 	///@notice let the contract recipient to withdraw the funds
+	///@dev Send all tokens in the contract (ETH, DAI, LINK)
 	function withdraw() public payable onlyRole(ADMIN) {
 		ERC20 daiCoin = ERC20(currencyToAddress[Currency.DAI]);
 		ERC20 linkCoin = ERC20(currencyToAddress[Currency.LINK]);
