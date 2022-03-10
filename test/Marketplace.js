@@ -84,7 +84,7 @@ describe("Marketplace contract", ()=> {
 			);
 		});
 
-		xdescribe("create new offer assumtions", ()=> {
+		describe("create new offer assumtions", ()=> {
 
 			it("Should allow to create a new offer", async ()=> {
 				let expectedData = [
@@ -129,7 +129,7 @@ describe("Marketplace contract", ()=> {
 			});
 		});
 
-		xdescribe("Cancel offer assumtions", ()=> {
+		describe("Cancel offer assumtions", ()=> {
 			it("Should allow to cancel the offer", async ()=> {
 				
 				await market.cancelOffer(0);
@@ -194,7 +194,7 @@ describe("Marketplace contract", ()=> {
 			});
 		});
 
-		xdescribe("Only Admin assumtions", ()=> {
+		describe("Only Admin assumtions", ()=> {
 			it("Should not allow a non admin to call these functions", async ()=> {
 				await expect(market.connect(addr1).setFee(20))
 				.to
