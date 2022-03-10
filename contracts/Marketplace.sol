@@ -150,6 +150,8 @@ contract Marketplace is MarketplaceCurrencies {
 		uint price = _getPrice(offer.price, paymentMethod);
 		uint approvedAmount = _getApprovedAmount(msg.sender, msg.value, paymentMethod);
 
+		require(offer.seller != address(0), "Specified Offer does not exist");
+		require(offer.deadline > block.timestamp, "The offer has expired");
 		require(offer.seller != msg.sender, "You cannot buy your own tokens");
 		require(approvedAmount >= price, "You have not sent enough token for this transaction");
 		
