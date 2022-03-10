@@ -1,12 +1,12 @@
 pragma solidity >= 0.8.0 < 0.9.0;
 
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "@chainlink/contracts/src/v0.8/Denominations.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
-contract MarketplaceCurrencies is Initializable, OwnableUpgradeable {
+contract MarketplaceCurrencies is Initializable, AccessControlUpgradeable {
 	AggregatorV3Interface internal ethPriceFeed;
 	AggregatorV3Interface internal daiPriceFeed;
 	AggregatorV3Interface internal linkPriceFeed;
@@ -19,16 +19,15 @@ contract MarketplaceCurrencies is Initializable, OwnableUpgradeable {
 
 	mapping(Currency => address) currencyToAddress;
 
-	function initialize(
+	function __MarketplaceCurrencies_init(
 		address _priceFeed,
 		address _daiPriceFeed,
 		address _linkPriceFeed,
 		address _daiContract,
 		address _linkContract
 	)
-	public
-	initializer {
-		__Ownable_init();
+	internal
+	onlyInitializing {
 		ethPriceFeed = AggregatorV3Interface(_priceFeed);
 		daiPriceFeed = AggregatorV3Interface(_daiPriceFeed);
 		linkPriceFeed = AggregatorV3Interface(_linkPriceFeed);
@@ -37,13 +36,13 @@ contract MarketplaceCurrencies is Initializable, OwnableUpgradeable {
 	}
 
 	function _getPrice(
-		int offerPrice,
+		uint offerPrice,
 		Currency paymentMethod
 	) 
 	internal
 	view
-	returns(int) {
-		int price;
+	returns(uint) {
+		uint price;
 		int currencyPrice;
 		uint currencyDecimals;
 		if(paymentMethod == Currency.ETH) {
@@ -57,13 +56,13 @@ contract MarketplaceCurrencies is Initializable, OwnableUpgradeable {
 			currencyDecimals = linkPriceFeed.decimals();
 		}
 
-		price =  1 ether * int(10**currencyDecimals) * offerPrice / currencyPrice; 
+		price =  1 ether * (10**currencyDecimals) * offerPrice / uint(currencyPrice); 
 		return price;
 	}
 
 	function _getApprovedAmount(
 		address buyer,
-		int sentValue,
+		uint sentValue,
 		Currency paymentMethod
 	) 
 	internal
@@ -72,7 +71,7 @@ contract MarketplaceCurrencies is Initializable, OwnableUpgradeable {
 		uint approvedAmount;
 
 		if(paymentMethod == Currency.ETH) {
-			approvedAmount = uint(sentValue);
+			approvedAmount = sentValue;
 		} else if (paymentMethod == Currency.DAI) {
 			approvedAmount = ERC20(currencyToAddress[Currency.DAI]).allowance(buyer, address(this));
 		} else if (paymentMethod == Currency.LINK) {
@@ -131,7 +130,7 @@ contract MarketplaceCurrencies is Initializable, OwnableUpgradeable {
 	}
 
 	function _getEthUsdPrice() 
-	public
+	internal
 	view
 	returns(int) {
 		(,int price,,,) = ethPriceFeed.latestRoundData();
@@ -139,7 +138,7 @@ contract MarketplaceCurrencies is Initializable, OwnableUpgradeable {
 	}
 
 	function _getDaiUsdPrice() 
-	public
+	internal
 	view
 	returns(int) {
 		(,int price,,,) = daiPriceFeed.latestRoundData();
@@ -147,7 +146,7 @@ contract MarketplaceCurrencies is Initializable, OwnableUpgradeable {
 	}
 
 	function _getLinkUsdPrice() 
-	public
+	internal
 	view
 	returns(int) {
 		(,int price,,,) = linkPriceFeed.latestRoundData();

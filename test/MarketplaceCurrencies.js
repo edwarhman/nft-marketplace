@@ -29,8 +29,8 @@ describe("Marketplace Currencies management", ()=> {
 	}
 
 	before(async ()=> {
-		MockFeed = await ethers.getContractFactory("MockV3Aggregator")
 		Manager = await ethers.getContractFactory("TestMarketplaceCurrencies");
+		MockFeed = await ethers.getContractFactory("MockV3Aggregator")
 		Coin = await ethers.getContractFactory("ERC20Token");
 	});
 
