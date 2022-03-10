@@ -6,6 +6,10 @@ import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "@chainlink/contracts/src/v0.8/Denominations.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
+
+///@title Marketplace Currencies 
+///@author Emerson Warhman
+///@notice This contract is used to get currencies prices from oracles and manage payments that use it 
 contract MarketplaceCurrencies is Initializable, AccessControlUpgradeable {
 	AggregatorV3Interface internal ethPriceFeed;
 	AggregatorV3Interface internal daiPriceFeed;
@@ -35,6 +39,7 @@ contract MarketplaceCurrencies is Initializable, AccessControlUpgradeable {
 		currencyToAddress[Currency.LINK] = _linkContract;
 	}
 
+	///@dev Get the offer price in the specified token
 	function _getPrice(
 		uint offerPrice,
 		Currency paymentMethod
@@ -55,11 +60,13 @@ contract MarketplaceCurrencies is Initializable, AccessControlUpgradeable {
 			currencyPrice = _getLinkUsdPrice();
 			currencyDecimals = linkPriceFeed.decimals();
 		}
-
+		///@dev All currencies used have 18 decimals so we use 1 ether unit
 		price =  1 ether * (10**currencyDecimals) * offerPrice / uint(currencyPrice); 
 		return price;
 	}
 
+	///@dev Get total approved amount by the seller to do the transaction
+	///@dev 
 	function _getApprovedAmount(
 		address buyer,
 		uint sentValue,
@@ -80,6 +87,9 @@ contract MarketplaceCurrencies is Initializable, AccessControlUpgradeable {
 		return approvedAmount;
 	}
 
+	///@dev handle the offer payment
+	///@dev discount fee from the payment and send the rest to the seller
+	///@dev if seller sent to much ETH the contract return him the exceeds of funds 
 	function _handlePayment(
 		address seller,
 		address buyer,
@@ -129,6 +139,7 @@ contract MarketplaceCurrencies is Initializable, AccessControlUpgradeable {
 		}
 	}
 
+	///@dev get current ETH price in USD from the oracle
 	function _getEthUsdPrice() 
 	internal
 	view
@@ -137,6 +148,7 @@ contract MarketplaceCurrencies is Initializable, AccessControlUpgradeable {
 		return price;
 	}
 
+	///@dev get current DAI price in USD from the oracle
 	function _getDaiUsdPrice() 
 	internal
 	view
@@ -145,6 +157,7 @@ contract MarketplaceCurrencies is Initializable, AccessControlUpgradeable {
 		return price;
 	}
 
+	///@dev get current LINK price in USD from the oracle
 	function _getLinkUsdPrice() 
 	internal
 	view
@@ -153,6 +166,8 @@ contract MarketplaceCurrencies is Initializable, AccessControlUpgradeable {
 		return price;
 	}
 
+	///@notice Get the ETH price feed
+	///@return Price feed address
 	function getEthPriceFeed()
 	public
 	view
@@ -160,6 +175,9 @@ contract MarketplaceCurrencies is Initializable, AccessControlUpgradeable {
 		return ethPriceFeed;
 	}
 
+
+	///@notice Get the DAI price feed
+	///@return Price feed address
 	function getDaiPriceFeed()
 	public
 	view
@@ -167,6 +185,9 @@ contract MarketplaceCurrencies is Initializable, AccessControlUpgradeable {
 		return daiPriceFeed;
 	}
 
+
+	///@notice Get the LINK price feed
+	///@return Price feed address
 	function getLinkPriceFeed()
 	public
 	view
