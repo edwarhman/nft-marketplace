@@ -173,4 +173,16 @@ contract Marketplace is MarketplaceCurrencies {
 			msg.sender
 		);
 	}
+
+	///@notice let the contract recipient to withdraw the funds
+	function withdraw() public payable onlyRole(ADMIN) {
+		ERC20 daiCoin = ERC20(currencyToAddress[Currency.DAI]);
+		ERC20 linkCoin = ERC20(currencyToAddress[Currency.LINK]);
+
+		(bool os,) = payable(recipient).call{value : address(this).balance}("");
+		require(os, "ETH cannot be sent to recipient");
+
+		daiCoin.transfer(recipient, daiCoin.balanceOf(address(this)));
+		linkCoin.transfer(recipient, linkCoin.balanceOf(address(this)));
+	}
 }
