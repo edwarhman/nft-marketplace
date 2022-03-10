@@ -24,7 +24,7 @@ describe("Marketplace contract", ()=> {
 	let tokenUri = "http://testcoin/";
 
 	//market variables
-	let week = 10;
+	let hour = 3600;
 	let weiPerEther = ethers.constants.WeiPerEther;
 	let fee = 5;
 	//feeds variables
@@ -79,12 +79,12 @@ describe("Marketplace contract", ()=> {
 				token.address,
 				tokenId,
 				tokenAmount,
-				week,
+				hour,
 				price
 			);
 		});
 
-		describe("create new offer assumtions", ()=> {
+		xdescribe("create new offer assumtions", ()=> {
 
 			it("Should allow to create a new offer", async ()=> {
 				let expectedData = [
@@ -107,7 +107,7 @@ describe("Marketplace contract", ()=> {
 					market.address,
 					tokenId,
 					tokenAmount + 20,
-					week,
+					hour,
 					price,
 				))
 				.to
@@ -120,7 +120,7 @@ describe("Marketplace contract", ()=> {
 					token.address,
 					tokenId,
 					tokenAmount + 20,
-					week,
+					hour,
 					price,
 				))
 				.to
@@ -129,7 +129,7 @@ describe("Marketplace contract", ()=> {
 			});
 		});
 
-		describe("Cancel offer assumtions", ()=> {
+		xdescribe("Cancel offer assumtions", ()=> {
 			it("Should allow to cancel the offer", async ()=> {
 				
 				await market.cancelOffer(0);
@@ -159,6 +159,16 @@ describe("Marketplace contract", ()=> {
 				.revertedWith("Specified Offer does not exist");				
 			});
 
+			it("Should not allow to accept an offer if the deadline has already passed", async ()=> {
+				await ethers.provider.send("evm_increaseTime", [hour]);
+				await ethers.provider.send("evm_mine");
+
+				await expect(market.connect(addr1).acceptOffer(0, ethEnum, {value: weiPerEther}))
+				.to
+				.be
+				.revertedWith("The offer has expired");
+			});
+
 			it("Should not allow to accept an offer if sent payment is less than offer price", async ()=> {
 				await expect(market.connect(addr1).acceptOffer(0, ethEnum))
 				.to
@@ -181,10 +191,10 @@ describe("Marketplace contract", ()=> {
 				.to
 				.deep
 				.equal(emptyOffer);
-			})
+			});
 		});
 
-		describe("Only Admin assumtions", ()=> {
+		xdescribe("Only Admin assumtions", ()=> {
 			it("Should not allow a non admin to call these functions", async ()=> {
 				await expect(market.connect(addr1).setFee(20))
 				.to
