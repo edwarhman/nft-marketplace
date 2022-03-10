@@ -6,3 +6,5 @@ contract/
 node_modules/
 artifacts/
 cache/
+.openzeppelin/
+coverage/
